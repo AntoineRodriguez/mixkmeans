@@ -1,0 +1,6 @@
+#IDE and venv
+/venv/
+/.idea/
+
+# data
+/data/
