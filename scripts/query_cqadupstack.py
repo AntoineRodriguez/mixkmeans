@@ -21,9 +21,9 @@ import pydoc, math
 import zipfile, random, datetime
 import itertools
 from operator import truediv
-from scipy.misc import comb
+from scipy.special import comb  #
 from random import randrange
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser #
 
 
 # Written by Doris Hoogeveen Nov 2015. For a usage please call the script without arguments.
@@ -187,13 +187,11 @@ class Subforum():
         uf = codecs.open(userfile, 'r', encoding='utf-8')
         self.userdict = json.load(uf)
 
-        print
-        "Loaded all data from", zipped_catfile
+        print("Loaded all data from", zipped_catfile)
 
     def tokenize(self, s):
         ''' Takes a string as input, tokenizes it using NLTK (http://www.nltk.org) and returns a list of the tokens. '''
-        return nltk.word_tokenize(
-            s)  # The NLTK tokenizer cuts things like 'cannot' into 'can' and 'not'.
+        return nltk.word_tokenize(s)  # The NLTK tokenizer cuts things like 'cannot' into 'can' and 'not'.
 
     ########################
     # GENERAL POST METHODS #

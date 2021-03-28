@@ -1,0 +1,3 @@
+HTMLparser # querycqa
+html.parser # querycqa préinstallé dans python ?
+pandas
