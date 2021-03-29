@@ -21,9 +21,9 @@ import pydoc, math
 import zipfile, random, datetime
 import itertools
 from operator import truediv
-from scipy.special import comb  #
+from scipy.special import comb  # python 3
 from random import randrange
-from html.parser import HTMLParser #
+from html.parser import HTMLParser # python 3
 
 
 # Written by Doris Hoogeveen Nov 2015. For a usage please call the script without arguments.

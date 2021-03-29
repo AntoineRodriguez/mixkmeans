@@ -1,6 +1,7 @@
 #IDE and venv
 /venv/
 /.idea/
+/scripts/__pycache__/
 
 # data
 /data/
