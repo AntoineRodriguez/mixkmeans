@@ -2,10 +2,22 @@
     - Collect data from CQADuspStack and convert it in pandas DataFrame
     - preprocessing
 """
+import json
+
 import pandas as pd
 
 from scripts.query_cqadupstack import *
 # TODO: optimiser les imports dans ce query_cqadupstack
+
+##############
+# FAIRE PLUTOT UN TRUC QUI LIT LES JSON
+##############
+
+
+def json_to_pandas(path_json):
+    with open(path_json, 'r') as file:
+        temp = json.load(file)
+    return pd.DataFrame.from_dict(temp, orient='index')
 
 
 def get_raw_dataframe(zip_path, save_path):
