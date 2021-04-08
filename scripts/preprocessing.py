@@ -4,7 +4,7 @@ import re
 import pandas as pd
 import nltk
 
-from scripts.stopwords import STOPWORDS
+from scripts.utils import STOPWORDS
 
 # nltk.download('punkt')
 
@@ -38,8 +38,33 @@ class SubForum:
             lambda row: nltk.word_tokenize(remove_punctuation(row['body'])),
             axis=1)
 
-    def autresuppresiondecolonnes(self):
+    def lemmatize(self):
         pass
+
+    def stemming(self):
+        pass
+
+    def expansion(self):
+        """ expansion of contracted forms"""
+        pass
+
+    def remove_links(self):
+        pass
+
+    def remove_word(self):
+        # TODO : lire processing article 1
+        # stopwords et plus utilisés
+        pass
+
+    def delete_columns(self):
+        """Delete unwanted columns"""
+        self.questions = self.questions[['body', 'title', 'score']]
+        self.answers = self.answers[['body', 'parentid', 'score']]
+
+    def preprocessing(self):
+        #lancer les autres fonctions
+        pass
+
 
 
 class SubForumStats(SubForum):
@@ -60,7 +85,22 @@ class SubForumStats(SubForum):
             axis=1)
 
     def count_words_threads(self):
-        pass
+        self.answers['nb_words'] = self.answers.apply(
+            lambda row: len(row['body']),
+            axis=1
+        )
+        self.questions['nb_words_threads'] = self.questions['nb_words'].copy()
+        # add number of words in title
+        self.questions['nb_words_threads'] += self.questions.apply(
+            lambda row: len(row['title']),
+            axis=1
+        )
+        # add number of words in each answers
+        self.questions['nb_words_threads'] += self.questions.apply(
+            lambda row:  sum(self.answers['nb_words'].loc[row['answers']]),
+            axis=1
+        )
+        del self.answers['nb_words']
 
     def count_duplicates(self):
         self.questions['nb_dups'] = self.questions.apply(
