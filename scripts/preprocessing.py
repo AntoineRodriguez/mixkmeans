@@ -40,7 +40,7 @@ class SubForum:
             axis=1)
 
     def lemmatize(self):
-        """ lemmatization of body after tokenize it.
+        """ lemmatization of a body after tokenize it.
         (lemmatization is preferred over Stemming because lemmatization 
         does morphological analysis of the words.)
         """
@@ -55,7 +55,7 @@ class SubForum:
                     remove_punctuation(row['body'])), axis=1))
         
     def stemming(self):
-        """stemming of body after tokenize it.
+        """stemming of a body after tokenize it.
         (stemming:  réduire un mot dans sa forme « racine »
         permet notamment de réduire la taille du vocabulaire dans les approches
         de type sac de mots ou Tf-IdF)
@@ -71,14 +71,15 @@ class SubForum:
                     remove_punctuation(row['body'])), axis=1))
 
     def expand_contractions(self):
-        """ expands the contracted forms in a body answer's and question's"""
+        """ expands the contracted forms in a body answer and question"""
         for c in contracted_forms:
-            self.questions['body'] = re.sub(c, contracted_forms[c], self.questions['body'])
+            self.questions['body'] = re.sub(c, contracted_forms[c], self.questions['body']) #tokenize?
             self.answers['body'] = re.sub(c, contracted_forms[c], self.answers['body'])
         #return self.questions['body']
 
-    def remove_links(self):
-        pass
+    def link_cleaning(self):
+        """ """
+        
 
     def remove_stopwords(self):
         # TODO : lire processing article 1
