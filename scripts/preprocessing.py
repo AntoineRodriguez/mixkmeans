@@ -1,10 +1,11 @@
 import json
 import re
-
 import pandas as pd
 import nltk
 
-from scripts.utils import STOPWORDS
+from scripts.utils import STOPWORDS, contracted_forms
+from nltk.stem.snowball import SnowballStemmer
+from nltk.stem import WordNetLemmatizer
 
 # nltk.download('punkt')
 
@@ -39,19 +40,47 @@ class SubForum:
             axis=1)
 
     def lemmatize(self):
-        pass
-
+        """ lemmatization of body after tokenize it.
+        (lemmatization is preferred over Stemming because lemmatization 
+        does morphological analysis of the words.)
+        """
+        lemmatizer = WordNetLemmatizer()
+        
+        self.answers['body'] = self.answers.apply(
+            lambda row: lemmatizer.lemmatize(nltk.word_tokenize(
+                    remove_punctuation(row['body'])), axis=1))
+            
+        self.questions['body'] = self.questions.apply(
+            lambda row: lemmatizer.lemmatize(nltk.word_tokenize(
+                    remove_punctuation(row['body'])), axis=1))
+        
     def stemming(self):
-        pass
+        """stemming of body after tokenize it.
+        (stemming:  réduire un mot dans sa forme « racine »
+        permet notamment de réduire la taille du vocabulaire dans les approches
+        de type sac de mots ou Tf-IdF)
+        """
+        stemmer = SnowballStemmer(language='english')
+        
+        self.answers['body'] = self.answers.apply(
+            lambda row: stemmer.steme(nltk.word_tokenize(
+                    remove_punctuation(row['body'])), axis=1))
+            
+        self.questions['body'] = self.questions.apply(
+            lambda row: stemmer.steme(nltk.word_tokenize(
+                    remove_punctuation(row['body'])), axis=1))
 
-    def expansion(self):
-        """ expansion of contracted forms"""
-        pass
+    def expand_contractions(self):
+        """ expands the contracted forms in a body answer's and question's"""
+        for c in contracted_forms:
+            self.questions['body'] = re.sub(c, contracted_forms[c], self.questions['body'])
+            self.answers['body'] = re.sub(c, contracted_forms[c], self.answers['body'])
+        #return self.questions['body']
 
     def remove_links(self):
         pass
 
-    def remove_word(self):
+    def remove_stopwords(self):
         # TODO : lire processing article 1
         # stopwords et plus utilisés
         pass
@@ -62,7 +91,7 @@ class SubForum:
         self.answers = self.answers[['body', 'parentid', 'score']]
 
     def preprocessing(self):
-        #lancer les autres fonctions
+        #to launch all functions
         pass
 
 
