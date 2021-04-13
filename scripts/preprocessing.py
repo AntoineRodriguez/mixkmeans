@@ -1,9 +1,11 @@
 import json
 import re
+import itertools
+
 import pandas as pd
 import nltk
 
-from scripts.utils import STOPWORDS, CONTRACTED_FORMS, OTHERS_STOPWORDS
+from scripts.utils import STOPWORDS, CONTRACTED_FORMS, OTHER_STOPWORDS
 from nltk.stem.snowball import SnowballStemmer
 from nltk.stem.wordnet import WordNetLemmatizer
 
@@ -16,41 +18,68 @@ def json_to_pandas(path_json):
     return pd.DataFrame.from_dict(temp, orient='index')
 
 
+def get_all_words(subforum):
+    """
+    description
+
+    subforum : SubForum object
+    """
+    temp = subforum.questions['body'].tolist()
+    words_list = list(itertools.chain(*temp))
+    temp = subforum.questions['title'].tolist()
+    words_list += list(itertools.chain(*temp))
+    temp = subforum.answers['body'].tolist()
+    words_list += list(itertools.chain(*temp))
+    return words_list
+
+
+df = pd.DataFrame({'a':[[1,2],[1]],'b':[[1,2],[3,4]]})
+
+
 def cleaning(string):
     """Delete punctuation of a sentence"""
     # remove
-    string = re.sub(r'<p>', '', string)
-    string = re.sub(r'</p>', '', string)
-    string = re.sub(r'\n', '', string)
+    string = re.sub(r'<p>', ' ', string)
+    string = re.sub(r'</p>', ' ', string)
+    string = re.sub(r'\n', ' ', string)
 
     # remove numbers
-    string = re.sub(r'[0-9]+', '', string)
+    string = re.sub(r'[0-9]+', ' ', string)
 
     # standard punctuation
-    string = re.sub(r'[\.,;:!\?_\-]', '', string)
+    string = re.sub(r'[\.,;:!\?_\-]', ' ', string)
     # anchors
-    string = re.sub(r'[\(\)\]\[\]\{\}\\\/\|]', '', string)
+    string = re.sub(r'[\(\)\]\[\]\{\}\\\/\|]', ' ', string)
     # special characters
-    string = re.sub(r'[<>+*=%#&]', '', string)
+    string = re.sub(r'[<>+*=%#&]', ' ', string)
     # currencies
-    string = re.sub(r'[£$€]', '', string)
+    string = re.sub(r'[£$€]', ' ', string)
     # quotations marks
-    string = re.sub(r'[`“”"]', '', string)
+    string = re.sub(r'[`“”"]', ' ', string)
     # remove possessive ' from words ended by s
     string = re.sub(r'([a-z])\' ', r'\1 ', string)
     return string
 
 
 class SubForum:
-    def __init__(self, questions_json, answers_json):
-        self.questions = json_to_pandas(questions_json)
-        self.answers = json_to_pandas(answers_json)
-        self.stopwords = STOPWORDS + OTHERS_STOPWORDS
+    def __init__(self, questions, answers):
+        ext = re.findall(r'.+(\.[a-z]+)', questions)[0]  # '../data/data_preprocess/stats_questions.csv'  # noqa
+        if ext == '.csv':
+            self.questions = pd.read_csv(questions)
+            self.answers = pd.read_csv(answers)
+        elif ext == '.json':
+            self.questions = json_to_pandas(questions)
+            self.answers = json_to_pandas(answers)
+        else:
+             raise TypeError('not a .csv or a .json file')
+
+        self.stopwords = STOPWORDS
 
         self.include_title = True
 
     def link_cleaning(self):
         """ Replace links and urls by ~url~ """
+        # https://stackoverflow.com/a/6041965/14836114
         reg = re.compile(r'(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])?')  # noqa
 
         self.answers['body'] = self.answers.apply(
@@ -108,7 +137,7 @@ class SubForum:
         does morphological analysis of the words.)
         """
         lemmatizer = WordNetLemmatizer()
-        
+
         self.answers['body'] = self.answers.apply(
             lambda row: [lemmatizer.lemmatize(item) for item in row['body']],
             axis=1
@@ -130,11 +159,11 @@ class SubForum:
         de type sac de mots ou Tf-IdF)
         """
         stemmer = SnowballStemmer(language='english')
-        
+
         self.answers['body'] = self.answers.apply(
             lambda row: [stemmer.stem(item) for item in row['body']],
             axis=1)
-            
+
         self.questions['body'] = self.questions.apply(
             lambda row: [stemmer.stem(item) for item in row['body']],
             axis=1)
@@ -160,6 +189,43 @@ class SubForum:
                 axis=1
             )
 
+    def remove_new_stopwords(self, stopwords):
+        """ remove other stopwords found with other methods"""
+        self.answers['body'] = self.answers.apply(
+            lambda row: [item for item in row['body'] if
+                         item not in stopwords],  # noqa
+            axis=1)
+
+        self.questions['body'] = self.questions.apply(
+            lambda row: [item for item in row['body'] if
+                         item not in stopwords],  # noqa
+            axis=1)
+
+        if self.include_title:
+            self.questions['title'] = self.questions.apply(
+                lambda row: [item for item in row['title'] if
+                             item not in stopwords],  # noqa
+                axis=1
+            )
+
+    def remove_all_stopwords(self):
+        self.answers['body'] = self.answers.apply(
+            lambda row: [item for item in row['body'] if
+                         item not in self.stopwords + OTHER_STOPWORDS],  # noqa
+            axis=1
+        )
+        self.questions['body'] = self.questions.apply(
+            lambda row: [item for item in row['body'] if
+                         item not in self.stopwords + OTHER_STOPWORDS],  # noqa
+            axis=1
+        )
+        if self.include_title:
+            self.questions['title'] = self.questions.apply(
+                lambda row: [item for item in row['title'] if
+                             item not in self.stopwords + OTHER_STOPWORDS],  # noqa
+                axis=1
+            )
+
     def delete_columns(self):
         """Delete unwanted columns"""
         if self.include_title:
@@ -174,8 +240,8 @@ class SubForum:
         self._cleaning()
         self.expand_contractions()
         self.tokenize()
-        self.lemmatize()
         self.remove_stopwords()
+        self.lemmatize()
 
 
 class SubForumStats(SubForum):

@@ -1,6 +1,6 @@
 import unittest
 
-from scripts import SubForum, SubForumStats
+from scripts import SubForum, SubForumStats, get_all_words
 
 
 class SubForumTest(unittest.TestCase):
@@ -81,6 +81,16 @@ class SubForumStatsTest(unittest.TestCase):
         self.object._preprocessing()
         self.object.count_duplicates()
         # print(self.object.questions['nb_dups'])
+
+
+class ModuleFunctionTest(unittest.TestCase):
+    def test_get_all_words(self):
+        self.object = SubForum('./questions.json',
+                               './answers.json')
+        # delete columns
+        self.object._preprocessing()
+        words = get_all_words(self.object)
+        print(words)
 
 
 if __name__ == '__main__':

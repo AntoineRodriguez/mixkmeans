@@ -101,7 +101,7 @@ STOPWORDS = ['a', 'about', 'above', 'according', 'across',
               'yet', 'yes', 'year', 'yippee', 'you', 'your',
               'yours', 'yourself', 'yourselves']
 
-OTHERS_STOPWORDS = []
+OTHER_STOPWORDS = []  # # # not useful
 
 CONTRACTED_FORMS = {'i\'m': 'i am',
                      'you\'re': 'you are',
