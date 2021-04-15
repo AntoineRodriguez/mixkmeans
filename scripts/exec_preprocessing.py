@@ -4,19 +4,42 @@ Preprocessing execution of both questions and answers datasets
 import time
 import pickle
 
-from scripts import SubForum, get_all_words
-    
+from scripts import SubForum, get_all_words, compare_id, update_id
 
 if __name__ == '__main__':
 
     #android
-    # start_time = time.time()
+    #start_time = time.time()
     
     android = SubForum('../data/android/android_questions.json',
                        '../data/android/android_answers.json')
+    
+    gis = SubForum('../data/gis/gis_questions.json',
+                   '../data/gis/gis_answers.json')
+    
+    physics = SubForum('../data/physics/physics_questions.json',
+                       '../data/physics/physics_answers.json')
+    
+    stats = SubForum('../data/stats/stats_questions.json',
+                     '../data/stats/stats_answers.json')
+    
+    #compare id
+    print(compare_id(android,gis))
+    print(compare_id(android,physics))
+    print(compare_id(android,stats))
+    print(compare_id(gis,physics))
+    print(compare_id(gis,stats))
+    print(compare_id(physics, stats))
+    
+    #update id
+    print(update_id(android))
+    print(update_id(gis))
+    print(update_id(physics))
+    print(update_id(stats))
+    
     """
     android.delete_columns()
-    # regarder les id et comparer
+    # regarder les id et comparer: comapre_id(subforum1,subforum2)
     android._preprocessing()
 
     words_android = get_all_words(android)
