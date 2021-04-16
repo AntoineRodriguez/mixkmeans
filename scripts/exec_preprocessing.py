@@ -9,6 +9,14 @@ from scripts import SubForum, get_all_words, compare_id, update_id
 if __name__ == '__main__':
 
     #android
+<<<<<<< Updated upstream
+    start_time = time.time()
+    
+    android = SubForum('../data/android/android_questions.json',
+                       '../data/android/android_answers.json')
+    print('done')
+
+=======
     #start_time = time.time()
     
     android = SubForum('../data/android/android_questions.json',
@@ -38,6 +46,7 @@ if __name__ == '__main__':
     print(update_id(stats))
     
     """
+>>>>>>> Stashed changes
     android.delete_columns()
     # regarder les id et comparer: comapre_id(subforum1,subforum2)
     android._preprocessing()
@@ -47,16 +56,17 @@ if __name__ == '__main__':
         pickle.dump(words_android, file)
     del words_android
 
-    with open('../data/data_preprocess/android_subforum.pkl', 'wb') as file:
+    with open('../data/data_preprocess/android.pkl', 'wb') as file:
         pickle.dump(android, file)
 
         # quand lecture mettre 'rb' et importer subforum
     
-    android.questions.to_csv('../data/data_preprocess/android_questions.csv', index=True, header=True)
-    android.answers.to_csv('../data/data_preprocess/android_answers.csv', index=True, header=True)
+    # android.questions.to_csv('../data/data_preprocess/android_questions.csv', index=True, header=True)
+    # android.answers.to_csv('../data/data_preprocess/android_answers.csv', index=True, header=True)
     
     print("--- %s seconds ---" % (time.time() - start_time))
     del android
+    """
     #gis
     start_time = time.time()
     
