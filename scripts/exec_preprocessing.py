@@ -175,5 +175,3 @@ with open('./data/data_preprocess/answers_DTM_occ.pkl', 'rb') as file:
 A_tfidf = transformer.fit_transform(A_count)
 with open('./data/data_preprocess/answers_DTM_tfidf.pkl', 'wb') as file:
     pickle.dump(A_tfidf, file)
-
-

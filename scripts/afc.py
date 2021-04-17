@@ -4,13 +4,14 @@
 import pickle
 
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.decomposition import FactorAnalysis
 
 if __name__ == '__main__':
 
     # -------------------------
     # Thematics-documents matrix
     # -------------------------
-
+      
     with open('../data/data_preprocess/subforums.pkl', 'rb') as file:
         subforums = pickle.load(file)
 
@@ -23,7 +24,7 @@ if __name__ == '__main__':
     onehot_encoder = OneHotEncoder(sparse=True)
     # for answers
     P_a = onehot_encoder.fit_transform(data.reshape(len(data), 1))
-
+    
     # -------------------------
     # Thematics-terms matrix
     # -------------------------
@@ -46,15 +47,38 @@ if __name__ == '__main__':
 
     with open('../data/thematics_terms/questions_TTM_occ.pkl', 'wb') as file:
         pickle.dump(TT_q_occ, file)
+    
+   
     with open('../data/thematics_terms/answers_TTM_occ.pkl', 'wb') as file:
         pickle.dump(TT_a_occ, file)
     with open('../data/thematics_terms/questions_TTM_tfidf.pkl', 'wb') as file:
         pickle.dump(TT_q_tfidf, file)
     with open('../data/thematics_terms/answers_TTM_tfidf.pkl', 'wb') as file:
         pickle.dump(TT_a_tfidf, file)
+    
 
     # -------------------------
     # AFC
     # -------------------------
 
-    # TODO
+    #apply AFC to any thematic_term_matrix obtained before
+        
+    # apply AFC to TT_q_occ matrix
+    transformer = FactorAnalysis(n_components=7, random_state=0)  #choix de n_comp ?
+    TT_q_occ_transformed = transformer.fit_transform(TT_q_occ)
+    TT_q_occ_transformed.shape
+    
+    # apply AFC to TT_a_occ matrix
+    transformer = FactorAnalysis(n_components=7, random_state=0)  
+    TT_a_occ_transformed = transformer.fit_transform(TT_a_occ)
+    TT_a_occ_transformed.shape
+    
+    # apply AFC to TT_q_tfidf matrix
+    transformer = FactorAnalysis(n_components=7, random_state=0)  
+    TT_q_tfidf_transformed = transformer.fit_transform(TT_q_tfidf)
+    TT_q_tfidf_transformed.shape
+    
+    # apply AFC to TT_a_tfidf matrix
+    transformer = FactorAnalysis(n_components=7, random_state=0)  
+    TT_a_tfidf_transformed = transformer.fit_transform(TT_a_tfidf)
+    TT_a_tfidf_transformed.shape 
