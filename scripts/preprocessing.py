@@ -182,9 +182,12 @@ class SubForum:
     def change_ids(self, letter):
         # TODO : Petite explication dans le LateX
         new_index = [letter + item for item in list(self.questions.index)]
-        self.questions.reindex(new_index)
+        self.questions.index = new_index
         new_index = [letter + item for item in list(self.answers.index)]
-        self.answers.reindex(new_index)
+        self.answers.index = new_index
+        self.answers['parentid'] = self.answers.apply(
+            lambda row: [letter + item for item in row['parentid']],  # noqa
+            axis=1)
 
     def pre_processing(self):
         self.delete_columns()
@@ -195,20 +198,9 @@ class SubForum:
         self.remove_stopwords()
         self.lemmatize()
 
-    def vocabularize(self, vocab):
-        self.answers['body'] = self.answers.apply(
-            lambda row: [item for item in row['body'] if
-                         item in vocab],
-            axis=1)
-        # transform as sentence for vectorization
-        self.answers['body'] = self.answers['body'].apply(
-            lambda sentence: ' '.join(sentence))
-        self.questions['body'] = self.questions.apply(
-            lambda row: [item for item in row['body'] if
-                         item in vocab],
-            axis=1)
-        self.questions['body'] = self.questions['body'].apply(
-            lambda sentence: ' '.join(sentence))
+    def remove_body(self):
+        del self.answers['body']
+        del self.questions['body']
 
 
 class SubForumStats(SubForum):
