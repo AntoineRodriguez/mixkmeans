@@ -3,76 +3,69 @@ temporary script
 """
 import pandas as pd
 
-df = pd.read_csv('./data/data_preprocess/stats_answers.csv')
-
 import pickle
-
-import matplotlib.pyplot as plt
-
 from statistics import quantiles
-
 from collections import Counter
+
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.preprocessing import OneHotEncoder
 
 from scripts import SubForum, get_all_words
 
-# android
-with open('./data/data_preprocess/android_words.pkl', 'rb') as file:
-    words_android = pickle.load(file)
-with open('./data/data_preprocess/android.pkl', 'rb') as file:
+with open('./data/data_preprocess/android_test.pkl', 'rb') as file:
     android = pickle.load(file)
 
-# VOCAB
-len(words_android)
+words_android = get_all_words(android)
+
 dic = Counter(words_android)
-"""
 dic = {k: v for k, v in dic.items() if v >= 3}
 len(dic)
-quantiles(dic.values(), n=10)  # n=100
-"""
-dic = {k: v for k, v in dic.items() if 181 > v >= 14}
+quant = quantiles(dic.values(), n=100)  # n=100
 
-# construction de la matrice document termes
-from scipy.sparse import csr_matrix
-import numpy as np
+dic = {k: v for k, v in dic.items() if quant[-1] > v}
 
-# NEEDS
-ids = android.questions.index
 vocab = list(dic.keys())
-# vocab_sorter = np.argsort(vocab) # indices des mots pour les trier
+del dic
 
 
-# associer body et title
+android.vocabularize(vocab)
+# matrice d'occurence
+vectorizer = CountVectorizer(vocabulary=vocab)
+# list_1 = vectorizer.get_feature_names() # == vocab
+Q_count = vectorizer.fit_transform(list(android.questions['body']))
+A_count = vectorizer.fit_transform(list(android.answers['body']))
 
-row_ind = []
-col_ind = []
-data = []
-data_tf = []
-dic_idf = dict.fromkeys(vocab, 0)
-for row, (doc, content) in enumerate(android.questions['body'].items()):
+# matrice tf-idf
+transformer = TfidfTransformer(smooth_idf=True, use_idf=True)
+Q_tfidf = transformer.fit_transform(Q_count)
+A_tfidf = transformer.fit_transform(A_count)
 
-    for term, nb in Counter(content).items():
-        if term in vocab:
-            data.append(nb)
-            data_tf.append(nb/len(content))  ### attention vocab
-            dic_idf[term] += 1  #ne marche pas
-            row_ind.append(row)
-            col_ind.append()  # comment ??
 
-from sklearn.preprocessing import OneHotEncoder
-
-df.index.apply(lambda str: 'a_' + str)
+# #ONE HOT ENCODING
 
 '''
-import numpy as np
 data = np.array(['a125214','a3221354','g211354'])
 data = ['a125214','a3221354','g211354']
-data = [item[0] for item in data]
-data = np.array(data)
-onehot_encoder = OneHotEncoder(sparse=True)
-onehot_encoded = onehot_encoder.fit_transform(data)
-onehot_encoded = onehot_encoder.fit_transform(data.reshape(len(data), 1))'''
+data = [item[0] for item in data]'''
 
-# DTM =
+# l'idée c'est ça !
+data = [item[0] for item in list(android.questions.index)]
+onehot_encoder = OneHotEncoder(sparse=True)
+# créer deux P différentes
+P = onehot_encoder.fit_transform(data)
+P = onehot_encoder.fit_transform(data.reshape(len(data), 1))
+
+
+# # AFC
+# matrice thématiques termes
+#  - matrice tt questions / answers tfidf / occurence QUATRE
+P.transpose().multiply(Q)
+
+
+android = SubForum('./data/android/android_questions.json',
+                   './data/android/android_answers.json')
+
+android.change_ids('a')
 
 if __name__ == '__main__':
     pass

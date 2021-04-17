@@ -1,129 +1,83 @@
 """
 Preprocessing execution of both questions and answers datasets
 """
-import time
 import pickle
+from collections import Counter
+from statistics import quantiles
 
-from scripts import SubForum, get_all_words, compare_id, update_id
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+
+from scripts import SubForum, get_all_words
+
+# TODO : ADD COMMENTS
 
 if __name__ == '__main__':
+    subforums = SubForum('../data/original_data/android_questions.json',
+                         '../data/original_data/android_answers.json')
+    # only android for the moment, needs to do that to deal with memory
+    subforums.change_ids('a')
+    subforums.pre_processing()
 
-    #android
-<<<<<<< Updated upstream
-    start_time = time.time()
-    
-    android = SubForum('../data/android/android_questions.json',
-                       '../data/android/android_answers.json')
-    print('done')
-
-=======
-    #start_time = time.time()
-    
-    android = SubForum('../data/android/android_questions.json',
-                       '../data/android/android_answers.json')
-    
-    gis = SubForum('../data/gis/gis_questions.json',
-                   '../data/gis/gis_answers.json')
-    
-    physics = SubForum('../data/physics/physics_questions.json',
-                       '../data/physics/physics_answers.json')
-    
-    stats = SubForum('../data/stats/stats_questions.json',
-                     '../data/stats/stats_answers.json')
-    
-    #compare id
-    print(compare_id(android,gis))
-    print(compare_id(android,physics))
-    print(compare_id(android,stats))
-    print(compare_id(gis,physics))
-    print(compare_id(gis,stats))
-    print(compare_id(physics, stats))
-    
-    #update id
-    print(update_id(android))
-    print(update_id(gis))
-    print(update_id(physics))
-    print(update_id(stats))
-    
-    """
->>>>>>> Stashed changes
-    android.delete_columns()
-    # regarder les id et comparer: comapre_id(subforum1,subforum2)
-    android._preprocessing()
-
-    words_android = get_all_words(android)
-    with open('../data/data_preprocess/android_words.pkl', 'wb') as file:
-        pickle.dump(words_android, file)
-    del words_android
-
-    with open('../data/data_preprocess/android.pkl', 'wb') as file:
-        pickle.dump(android, file)
-
-        # quand lecture mettre 'rb' et importer subforum
-    
-    # android.questions.to_csv('../data/data_preprocess/android_questions.csv', index=True, header=True)
-    # android.answers.to_csv('../data/data_preprocess/android_answers.csv', index=True, header=True)
-    
-    print("--- %s seconds ---" % (time.time() - start_time))
-    del android
-    """
-    #gis
-    start_time = time.time()
-    
-    gis = SubForum('../data/gis/gis_questions.json',
-                   '../data/gis/gis_answers.json')
-    
-    gis.delete_columns()
-    gis._preprocessing()
-
-    words_gis = get_all_words(gis)
-    with open('../data/data_preprocess/gis_words.pkl', 'wb') as file:
-        pickle.dump(words_gis, file)
-    del words_gis
-
-    gis.questions.to_csv('../data/data_preprocess/gis_questions.csv', index=True, header=True)
-    gis.answers.to_csv('../data/data_preprocess/gis_answers.csv', index=True, header=True)
-    
-    print("--- %s seconds ---" % (time.time() - start_time))
+    gis = SubForum('../data/original_data/gis_questions.json',
+                   '../data/original_data/gis_answers.json')
+    gis.change_ids('g')
+    gis.pre_processing()
+    subforums = subforums + gis
     del gis
-    
-    #physics
-    start_time = time.time()
-    
-    physics = SubForum('../data/physics/physics_questions.json',
-                       '../data/physics/physics_answers.json')
-    
-    physics.delete_columns()
-    physics._preprocessing()
 
-    words_physics = get_all_words(physics)
-    with open('../data/data_preprocess/physics_words.pkl', 'wb') as file:
-        pickle.dump(words_physics, file)
-    del words_physics
-    
-    physics.questions.to_csv('../data/data_preprocess/physics_questions.csv', index=True, header=True)
-    physics.answers.to_csv('../data/data_preprocess/physics_answers.csv', index=True, header=True)
-    
-    print("--- %s seconds ---" % (time.time() - start_time))
+    physics = SubForum('../data/original_data/physics_questions.json',
+                       '../data/original_data/physics_answers.json')
+    physics.change_ids('p')
+    physics.pre_processing()
+    subforums = subforums + physics
     del physics
 
-    #stats
-    start_time = time.time()
-    
-    stats = SubForum('../data/stats/stats_questions.json',
-                     '../data/stats/stats_answers.json')
-
-    stats.delete_columns()
-    stats._preprocessing()
-    words_stats = get_all_words(stats)
-    with open('../data/data_preprocess/stats_words.pkl', 'wb') as file:
-        pickle.dump(words_stats, file)
-    del words_stats
-    
-    stats.questions.to_csv('../data/data_preprocess/stats_questions.csv', index=True, header=True)
-    stats.answers.to_csv('../data/data_preprocess/stats_answers.csv', index=True, header=True)
-    
-    print("--- %s seconds ---" % (time.time() - start_time))
+    stats = SubForum('../data/original_data/stats_questions.json',
+                     '../data/original_data/stats_answers.json')
+    stats.change_ids('s')
+    stats.pre_processing()
+    subforums = subforums + stats
     del stats
-"""
+    
+    # ----------------------
+    # Get vocabulary 
+    # ----------------------
+    words = get_all_words(subforums)
+    
+    dic = Counter(words)
+    dic = {k: v for k, v in dic.items() if v >= 3}
+    quant = quantiles(dic.values(), n=100)
+    dic = {k: v for k, v in dic.items() if quant[-1] > v}
+    vocab = list(dic.keys())
+    del dic
 
+    subforums.vocabularize(vocab)
+    with open('../data/data_preprocess/subforums.pkl', 'wb') as file:
+        pickle.dump(subforums, file)
+
+    # ----------------------
+    # Documents-Terms-Matrix
+    # ----------------------
+    
+    vectorizer = CountVectorizer(vocabulary=vocab)
+
+    Q_count = vectorizer.fit_transform(list(subforums.questions['body']))
+    with open('../data/data_preprocess/questions_DTM_occ.pkl', 'wb') as file:
+        pickle.dump(Q_count, file)
+
+    A_count = vectorizer.fit_transform(list(subforums.answers['body']))
+    with open('../data/data_preprocess/answers_DTM_occ.pkl', 'wb') as file:
+        pickle.dump(A_count, file)
+    del subforums
+
+    # matrice tf-idf
+    transformer = TfidfTransformer(smooth_idf=True, use_idf=True)
+
+    Q_tfidf = transformer.fit_transform(Q_count)
+    with open('../data/data_preprocess/questions_DTM_tfidf.pkl', 'wb') as file:
+        pickle.dump(Q_tfidf, file)
+    del Q_count
+
+    A_tfidf = transformer.fit_transform(A_count)
+    with open('../data/data_preprocess/answers_DTM_tfidf.pkl', 'wb') as file:
+        pickle.dump(A_tfidf, file)

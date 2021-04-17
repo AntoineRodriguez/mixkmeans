@@ -1,6 +1,16 @@
 import unittest
+import pickle
 
 from scripts import SubForum, SubForumStats, get_all_words
+
+'''
+import json
+import pandas as pd
+def json_to_pandas(path_json):
+    with open(path_json, 'r') as file:
+        temp = json.load(file)
+    return pd.DataFrame.from_dict(temp, orient='index')
+questions = json_to_pandas('unittest/questions.json')'''
 
 
 class SubForumTest(unittest.TestCase):
@@ -13,19 +23,19 @@ class SubForumTest(unittest.TestCase):
                                './answers.json')
 
     def test_discard_punctuation(self):
-        self.object = SubForumStats('./questions.json',
+        self.object = SubForum('./questions.json',
                                     './answers.json')
         self.object._cleaning()
         # print(self.object.questions['body'][0])
 
     def test_expand_contractions(self):
-        self.object = SubForumStats('./questions.json',
+        self.object = SubForum('./questions.json',
                                     './answers.json')
         self.object.expand_contractions()
         # print(self.object.questions['body'][0])
 
     def test_tokenize(self):
-        self.object = SubForumStats('./questions.json',
+        self.object = SubForum('./questions.json',
                                     './answers.json')
         self.object.link_cleaning()
         self.object._cleaning()
@@ -34,7 +44,7 @@ class SubForumTest(unittest.TestCase):
         # print(self.object.questions['body'][0])
 
     def test_lemmatize(self):
-        self.object = SubForumStats('./questions.json',
+        self.object = SubForum('./questions.json',
                                     './answers.json')
         self.object.link_cleaning()
         self.object._cleaning()
@@ -43,11 +53,25 @@ class SubForumTest(unittest.TestCase):
         self.object.lemmatize()
         # print(self.object.questions['body'][0])
 
-    def test_preprocessing(self):
-        self.object = SubForumStats('./questions.json',
+    def test_link_cleaning(self):
+        self.object = SubForum('./questions.json',
+                               './answers.json')
+        self.object.link_cleaning()
+        print(self.object.answers['body'][0])
+
+    def test__cleaning(self):
+        self.object = SubForum('./questions.json',
+                               './answers.json')
+        self.object._cleaning()
+        print(self.object.questions['body'][0])
+
+    def test_pre_processing(self):
+        self.object = SubForum('./questions.json',
                                     './answers.json')
-        self.object._preprocessing()
+        self.object.pre_processing()
         # print(self.object.questions['body'][0])
+        with open('../data/data_preprocess/android_test.pkl', 'wb') as file:
+            pickle.dump(self.object, file)
 
 
 class SubForumStatsTest(unittest.TestCase):
@@ -88,7 +112,7 @@ class ModuleFunctionTest(unittest.TestCase):
         self.object = SubForum('./questions.json',
                                './answers.json')
         # delete columns
-        self.object._preprocessing()
+        self.object.pre_processing()
         words = get_all_words(self.object)
         print(words)
 
