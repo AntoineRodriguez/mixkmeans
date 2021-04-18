@@ -164,7 +164,7 @@ with open('./data/data_preprocess/answers_DTM_occ.pkl', 'wb') as file:
 # TF IDF
 transformer = TfidfTransformer(smooth_idf=True, use_idf=True)
 
-Q_tfidf = transformer.fit_transform(Q_count)
+Q_tfidf = transformer.fit_transform(Q_count)                           # <-- faut il la lecture de Q_count ?
 with open('./data/data_preprocess/questions_DTM_tfidf.pkl', 'wb') as file:
     pickle.dump(Q_tfidf, file)
 del Q_count
