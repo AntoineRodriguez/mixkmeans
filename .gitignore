@@ -1,12 +1,12 @@
-#IDE and venv
-/venv/
-/.idea/
-/scripts/__pycache__/
-/.spyproject/
-
 # data
 /data/
 
-
 # Antoine
 /old/
+kmeans.py
+/venv/
+/.idea/
+/scripts/__pycache__/
+
+# Lilia
+/.spyproject/
