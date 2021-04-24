@@ -185,12 +185,17 @@ class SubForum:
         self.questions.index = new_index
         new_index = [letter + item for item in list(self.answers.index)]
         self.answers.index = new_index
+        '''
         self.answers['parentid'] = self.answers.apply(
             lambda row: [letter + item for item in row['parentid']],  # noqa
-            axis=1)
+            axis=1)'''
+        self.answers['parentid'] = self.answers['parentid'].apply(lambda item: letter + item)  # noqa
+
+    # fonction retirer les mauvaises lignes
 
     def pre_processing(self):
         self.delete_columns()
+        # retirer les mauvaises lignes
         self.link_cleaning()
         self._cleaning()
         self.expand_contractions()

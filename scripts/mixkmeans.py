@@ -22,6 +22,7 @@ def assign_clusters(dataset, prototypes):
     """
     pass
 
+# TODO : QUID DE LA CREUSITUDE
 
 # TODO : format de a et b ?!?!?!!!
 def dist(a, b):
@@ -30,6 +31,7 @@ def dist(a, b):
     return sum((a - b)**2)
 
 
+# POINT = (question vectorisée, reponse vectorisée)
 def composite_distance(point, prototype, x, weights, dtype):
     """
     Compute  point-to-prototype (or point-to-point) distance
@@ -37,7 +39,7 @@ def composite_distance(point, prototype, x, weights, dtype):
     :param point, prototype:
     :param x:
     :param weights:
-    :param dtype:
+    :param dtype: 'qa', 'q' or 'a'
     :return:
     """
     dic = {'qa': (1, 1), 'q': (1, 0), 'a': (0, 1)}
@@ -55,7 +57,7 @@ class MixKMeans:
         :param x: negative float
         :param weights: tuple or list of the two weights given to each part
         """
-        if x > 0:
+        if x != 1 and x > 0:
             raise ValueError('x must be negative or zero')
         else:
             self.x = x  # huge negative
@@ -72,7 +74,7 @@ class MixKMeans:
 
         self.prototypes = None  # best prototypes
 
-    def fit(self, dataset, K=4, itermax=100):
+    def fit(self, dataset, K, itermax):
         """
         Process training of MixKmeans model on our dataset
 
@@ -83,10 +85,10 @@ class MixKMeans:
         self.K = K
         self.itermax = itermax
 
-        # Initialization
+        # Initialization des premier prototypes
             # choix d'un point aléatoire
 
-            # jusqu'à 3 autre choix de point faire choix du point le plus éloigné des points précédents  # noqa
+            # jusqu'à K-1 autre choix de point faire choix du point le plus éloigné des points précédents  # noqa
 
         iteration = 0
         condition = True
@@ -100,6 +102,8 @@ class MixKMeans:
             iteration += 1
 
         # sauvegarder les prototypes dans self.prototypes
+
+        # message pour dire qu'il n'y a pas eu convergence
         print('Done ! (in {} iterations)'.format(iteration))
 
     def predict(self, dataset):

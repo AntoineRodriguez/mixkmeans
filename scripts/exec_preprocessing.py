@@ -32,6 +32,9 @@ android = SubForum('./data/original_data/android_questions.json',
                      './data/original_data/android_answers.json')
 # only android for the moment, needs to do that to deal with memory
 android.change_ids('a')
+
+# TODO ensemble !!
+
 android.pre_processing()
 
 q_index = list(android.questions.index)
@@ -46,6 +49,7 @@ del android
 gis = SubForum('./data/original_data/gis_questions.json',
                './data/original_data/gis_answers.json')
 gis.change_ids('g')
+
 gis.pre_processing()
 
 q_index += list(gis.questions.index)

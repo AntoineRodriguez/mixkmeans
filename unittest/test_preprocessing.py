@@ -73,6 +73,13 @@ class SubForumTest(unittest.TestCase):
         with open('../data/data_preprocess/android_test.pkl', 'wb') as file:
             pickle.dump(self.object, file)
 
+    def test_change_ids(self):
+        self.object = SubForum('./questions.json',
+                               './answers.json')
+        print(self.object.answers['parentid'])
+        self.object.change_ids('z')
+        print(self.object.answers['parentid'])
+
 
 class SubForumStatsTest(unittest.TestCase):
     def setUp(self):
