@@ -191,11 +191,19 @@ class SubForum:
             axis=1)'''
         self.answers['parentid'] = self.answers['parentid'].apply(lambda item: letter + item)  # noqa
 
-    # fonction retirer les mauvaises lignes
+    # TODO: fonction retirer les mauvaises lignes
+    
+    def del_line(self, q_index, ens):
+        q_index = self.questions.index
+        for i in list(q_index):
+            if i not in ens:
+                #self.questions.drop(self.question.index)
+                
+       # self.questions.index.apply(lambda: i for i in listself.questions.index not in self.answers['parentid']
 
     def pre_processing(self):
         self.delete_columns()
-        # retirer les mauvaises lignes
+        #self.del_line()
         self.link_cleaning()
         self._cleaning()
         self.expand_contractions()

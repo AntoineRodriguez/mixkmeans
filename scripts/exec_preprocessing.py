@@ -14,7 +14,7 @@ import os
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from scipy import sparse
 
-from scripts import SubForum, get_all_words
+from scripts import SubForum, get_all_words, del_line
 #os.chdir((os.getcwd()+'\scripts'))
 
 
@@ -32,8 +32,14 @@ android = SubForum('./data/original_data/android_questions.json',
                      './data/original_data/android_answers.json')
 # only android for the moment, needs to do that to deal with memory
 android.change_ids('a')
+"""
+ens_android = q_index inter setparentid
+"""
+q_index_android = set(android.questions.index)   #len(q_index_android) = 23697 
+a_parentid_android = set(android.answers.parentid) #len(a_parentid_android) = 17575
+ens_android = list(q_index_android & a_parentid_android)   #len(ens_android) = 17575  # ==> il ya des quest sans rép
 
-# TODO ensemble !!
+del_line(q_index_android,ens_android)
 
 android.pre_processing()
 
@@ -50,6 +56,10 @@ gis = SubForum('./data/original_data/gis_questions.json',
                './data/original_data/gis_answers.json')
 gis.change_ids('g')
 
+q_index_gis = set(gis.questions.index)     #len(q_index_gis) = 38522      
+a_parentid_gis = set(gis.answers.parentid)  #len(a_parentid_gis) = 30395
+ens_gis = list(q_index_gis & a_parentid_gis)  #len(ens_gis) = 30395      # ==> il y a des quest sans rép
+
 gis.pre_processing()
 
 q_index += list(gis.questions.index)
@@ -64,6 +74,11 @@ del gis
 physics = SubForum('./data/original_data/physics_questions.json',
                    './data/original_data/physics_answers.json')
 physics.change_ids('p')
+
+q_index_physics = set(physics.questions.index)     #len(q_index_physics) = 39355      
+a_parentid_physics = set(physics.answers.parentid)  #len(a_parentid_physics) = 33271
+ens_physics = list(q_index_physics & a_parentid_physics)  #len(ens_physics) = 33271  # ==> il y a des quest sans rép
+
 physics.pre_processing()
 
 q_index += list(physics.questions.index)
@@ -78,6 +93,11 @@ del physics
 stats = SubForum('./data/original_data/stats_questions.json',
                  './data/original_data/stats_answers.json')
 stats.change_ids('s')
+
+q_index_stats = set(stats.questions.index)     #len(q_index_stats) = 42921      
+a_parentid_stats = set(stats.answers.parentid)  #len(a_parentid_stats) = 29006
+ens_stats = list(q_index_stats & a_parentid_stats)  #len(ens_stats) = 29006  # ==> il y a des quest sans rép
+
 stats.pre_processing()
 
 q_index += list(stats.questions.index)
