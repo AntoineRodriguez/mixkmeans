@@ -32,7 +32,7 @@ def dist(a, b):
 
 
 # POINT = (question vectorisée, reponse vectorisée)
-def composite_distance(point, prototype, x, weights, dtype):
+def composite_distance(point, prototype, x, weights):
     """
     Compute  point-to-prototype (or point-to-point) distance
 
@@ -42,10 +42,9 @@ def composite_distance(point, prototype, x, weights, dtype):
     :param dtype: 'qa', 'q' or 'a'
     :return:
     """
-    dic = {'qa': (1, 1), 'q': (1, 0), 'a': (0, 1)}
     d1 = pow(dist(point[0], prototype[0]), x)
     d2 = pow(dist(point[1], prototype[1]), x)
-    return dic[dtype][0] * weights[0] * d1 + dic[dtype][1] * weights[1] * d2
+    return weights[0] * d1 + weights[1] * d2
 
 
 class MixKMeans:
@@ -105,6 +104,8 @@ class MixKMeans:
 
         # message pour dire qu'il n'y a pas eu convergence
         print('Done ! (in {} iterations)'.format(iteration))
+
+        # retour de la fonction objectif, centroides et clustering
 
     def predict(self, dataset):
         if self.prototypes:

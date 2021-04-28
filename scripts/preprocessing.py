@@ -192,18 +192,18 @@ class SubForum:
         self.answers['parentid'] = self.answers['parentid'].apply(lambda item: letter + item)  # noqa
 
     # TODO: fonction retirer les mauvaises lignes
-    
-    def del_line(self, q_index, ens):
-        q_index = self.questions.index
-        for i in list(q_index):
-            if i not in ens:
-                #self.questions.drop(self.question.index)
-                
-       # self.questions.index.apply(lambda: i for i in listself.questions.index not in self.answers['parentid']
+
+    def delete_rows(self):
+        """"""
+        # score sup à 6
+        self.answers = self.answers[self.answers['score'] >= 6]
+        # seulement les qa valides
+        self.questions = self.questions[self.questions.index.isin(self.answers['parentid'])]
+        self.answers = self.answers[self.answers['parentid'].isin(self.questions.index)]
 
     def pre_processing(self):
+        self.delete_rows()
         self.delete_columns()
-        #self.del_line()
         self.link_cleaning()
         self._cleaning()
         self.expand_contractions()
