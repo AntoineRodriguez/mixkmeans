@@ -3,10 +3,10 @@
 
 # Antoine
 /old/
-kmeans.py
 /venv/
 /.idea/
-/scripts/__pycache__/
+*.pyc
+
 
 # Lilia
 /.spyproject/

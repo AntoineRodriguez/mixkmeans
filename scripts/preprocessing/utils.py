@@ -1,6 +1,8 @@
 import json
 import re
 import itertools
+from collections import Counter
+from statistics import quantiles
 
 import pandas as pd
 import nltk
@@ -9,14 +11,18 @@ from scripts.utils import STOPWORDS, CONTRACTED_FORMS, OTHER_STOPWORDS
 from nltk.stem.snowball import SnowballStemmer
 from nltk.stem.wordnet import WordNetLemmatizer
 
-
-# nltk.download('punkt')
-
-
 def json_to_pandas(path_json):
     with open(path_json, 'r') as file:
         temp = json.load(file)
     return pd.DataFrame.from_dict(temp, orient='index')
+
+
+def reduce_words(words):
+    dic = Counter(words)
+    dic = {k: v for k, v in dic.items() if v >= 3}
+    quant = quantiles(dic.values(), n=100)
+    dic = {k: v for k, v in dic.items() if quant[-1] > v}
+    return list(dic.keys())
 
 
 def get_all_words(subforum):

@@ -2,31 +2,22 @@
 Preprocessing execution of both questions and answers datasets
 """
 import pickle
-from collections import Counter
-from statistics import quantiles
 import sys
 import os
+
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from scipy import sparse
 
-from scripts import SubForum, get_all_words
-
-
-def reduce_words(words):
-    dic = Counter(words)
-    dic = {k: v for k, v in dic.items() if v >= 3}
-    quant = quantiles(dic.values(), n=100)
-    dic = {k: v for k, v in dic.items() if quant[-1] > v}
-    return list(dic.keys())
-
+from scripts.preprocessing.utils import SubForum, get_all_words, reduce_words
 
 if __name__ == '__main__':
+    os.chdir('../../')
     # ----------------------
     # Preprocessing
     # ----------------------
 
     android = SubForum('./data/original_data/android_questions.json',
-                   './data/original_data/android_answers.json')
+                    './data/original_data/android_answers.json')
     # only android for the moment, needs to do that to deal with memory
     android.change_ids('a')
     android.pre_processing()
@@ -57,6 +48,9 @@ if __name__ == '__main__':
     # ----------------------
 
     vocab = reduce_words(get_all_words(android))  # android contains all the 4 datasets
+
+    with open('./data/data_preprocess/vocab.pkl', 'wb') as file:
+        pickle.dump(vocab, file)
 
     # ----------------------
     # Documents-Terms-Matrix
