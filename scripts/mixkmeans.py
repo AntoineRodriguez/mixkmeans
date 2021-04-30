@@ -3,6 +3,8 @@
 """
 import numpy as np
 
+import math
+
 
 def compute_prototypes():
     """
@@ -24,11 +26,13 @@ def assign_clusters(dataset, prototypes):
 
 # TODO : QUID DE LA CREUSITUDE
 
-# TODO : format de a et b ?!?!?!!!
+
 def dist(a, b):
-    """Element-wise distance"""
-    # PROBABLEMENT PAS NUMPY
-    return sum((a - b)**2)
+    """Element-wise distance between to sparce matrix 1xM"""
+    if a.shape == b.shape:
+        return (a - b).power(2).sum(axis=1)[0, 0]
+    else:
+        raise ValueError('a and b must have the same shape')
 
 
 # POINT = (question vectorisée, reponse vectorisée)
@@ -42,9 +46,16 @@ def composite_distance(point, prototype, x, weights):
     :param dtype: 'qa', 'q' or 'a'
     :return:
     """
-    d1 = pow(dist(point[0], prototype[0]), x)
-    d2 = pow(dist(point[1], prototype[1]), x)
-    return weights[0] * d1 + weights[1] * d2
+    if point.shape == prototype.shape:
+        if point.shape[1] % 2 == 0:
+            d1 = dist(point[:, 0:int(point.shape[1] / 2)], prototype[:, 0:int(prototype.shape[1] / 2)])
+            d2 = dist(point[:, int(point.shape[1] / 2):], prototype[:, int(prototype.shape[1] / 2):])
+            return math.pow(weights[0] * d1, x) + math.pow(weights[1] * d2, x)
+        else:
+            raise ValueError('Length of vectors must be even')  # by construction
+    else:
+        raise ValueError('point and prototype must have the same shape')
+
 
 
 class MixKMeans:

@@ -10,14 +10,14 @@ def json_to_pandas(path_json):
     with open(path_json, 'r') as file:
         temp = json.load(file)
     return pd.DataFrame.from_dict(temp, orient='index')
-questions = json_to_pandas('unittest/questions.json')'''
+questions = json_to_pandas('tests/questions.json')'''
 
 
 class SubForumTest(unittest.TestCase):
     def setUp(self):
         self.object = None
 
-    @unittest.skip
+    @tests.skip
     def test_init(self):
         self.object = SubForum('./questions.json',
                                './answers.json')
@@ -81,7 +81,7 @@ class SubForumTest(unittest.TestCase):
         print(self.object.answers['parentid'])
 
 
-class SubForumStatsTest(unittest.TestCase):
+class SubForumStatsTest(tests.TestCase):
     def setUp(self):
         self.object = None
 
@@ -114,7 +114,7 @@ class SubForumStatsTest(unittest.TestCase):
         # print(self.object.questions['nb_dups'])
 
 
-class ModuleFunctionTest(unittest.TestCase):
+class ModuleFunctionTest(tests.TestCase):
     def test_get_all_words(self):
         self.object = SubForum('./questions.json',
                                './answers.json')
@@ -125,4 +125,4 @@ class ModuleFunctionTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    tests.main()
