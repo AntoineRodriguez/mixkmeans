@@ -71,14 +71,14 @@ class MixKMeans:
     # - Methods needed to fit the model to the data
     # --------------
     def initialize_prototypes(self, dataset, K):
-        """Initialize prototypes (i.e. centroid in this mixkmeans) inspired to 'spreading out the cluster centroids'
+        """
+        Initialize prototypes (i.e. centroid in this mixkmeans) inspired to 'spreading out the cluster centroids'
         :param dataset:
         :param K: number of clusters
         """
-        self.K = K
         indexes = [randint(0, dataset.shape[0] - 1)]
 
-        for i in range(self.K - 1):
+        for i in range(K - 1):
             vec_dist = []
             for row in dataset:
                 sum_dist = 0
@@ -120,7 +120,7 @@ class MixKMeans:
 
             indexes = np.where(np.array(assignation) == cluster_ind)[0]  # indexes where Q | A in current cluster
             Q = dataset[indexes, 0:int(dataset.shape[1] / 2)]
-            A = dataset[indexes, 0:int(dataset.shape[1] / 2)]
+            A = dataset[indexes, int(dataset.shape[1] / 2):]
 
             sum_dist_q = 0
             sum_dist_a = 0
@@ -128,6 +128,10 @@ class MixKMeans:
 
             if dataset[indexes].shape[0] == 1:
                 prototypes.append(dataset[indexes])
+                continue
+
+            if dataset[indexes].shape[0] == 0:
+                prototypes.append(None)
                 continue
 
             for index, row in enumerate(dataset[indexes]):
@@ -148,7 +152,7 @@ class MixKMeans:
             Q = Q.multiply(1 / sum_dist_q)
             A = A.multiply(1 / sum_dist_a)
 
-            qa = np.concatenate([np.array(Q.sum(axis=0)), np.array(A.sum(axis=0))])
+            qa = np.concatenate([np.array(Q.sum(axis=0)), np.array(A.sum(axis=0))], axis=1)
             prototypes.append(sparse.csr_matrix(qa))
 
         self.prototypes = prototypes
@@ -165,6 +169,7 @@ class MixKMeans:
         :param K: number of clusters
         :return:
         """
+        # print('Begin fitting')
         self.K = K
         self.itermax = itermax
         self.initialize_prototypes(dataset, self.K)
@@ -172,7 +177,8 @@ class MixKMeans:
         iteration = 0
         cost = 0
         condition = True
-        while iteration < self.itermax & condition:
+        while (iteration < self.itermax) & condition:
+            print(iteration)
             # assigner à chq point un cluster
             assignation = self.assign_clusters(dataset)
             old_prototypes = self.prototypes
@@ -180,6 +186,9 @@ class MixKMeans:
 
             cost = 0
             for ind, prototype in enumerate(old_prototypes):
+                print(10*'---')
+                print(self.prototypes[ind].shape)
+                print(prototype.shape)
                 c_d = composite_distance(self.prototypes[ind], prototype, self.x, self.weights)
                 if c_d != 0:
                     cost += math.pow(c_d, 1 / self.x)
@@ -188,12 +197,13 @@ class MixKMeans:
 
         # message pour dire qu'il n'y a pas eu convergence
         if iteration >= self.itermax:
-            print('Pas de convergence ! Processus arrêté au bout de {} iterations)'.format(iteration))
+            print('Pas de convergence ! Processus arrêté au bout de {} iterations)'.format(iteration))  # english
 
         last_assignation = self.assign_clusters(dataset)
 
         return self.prototypes, last_assignation, cost
 
+    # Dataset ou moins # TODO
     def predict(self, dataset):
         if self.prototypes:
             assignation = self.assign_clusters(dataset)

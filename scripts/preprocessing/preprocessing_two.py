@@ -9,7 +9,7 @@ from scipy import sparse
 
 df = pd.read_csv('./data/data_preprocess/indexes.csv')
 
-if __name__ == '__name__':
+if __name__ == '__main__':
     os.chdir('../../')
     # Occurences matrix
     answers = pd.read_csv('data/data_preprocess/subforum_answers.csv', index_col=0)
