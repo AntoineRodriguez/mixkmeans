@@ -63,7 +63,30 @@ if __name__ == '__main__':
     with open('./data/thematics_terms/TTM_answers_tfidf.pkl', 'wb') as file:
         pickle.dump(TT_a_tfidf, file)
     
+    
+    #matrix TT to df to csv, then use csv file in R code below
+    TT_occ_q = pd.DataFrame(TT_q_occ)  #shape = 4*1 why?
+    TT_occ_q.to_csv('./data/TT_csv/TT_occ_q.csv')
 
+
+    #################
+    # LE CODE R
+    #################
+#    data = read.csv("data/TT_csv/TT_occ_q.csv")
+#
+#    library(FactoMineR)
+#    library(ggplot2)
+#    library(ggrepel)
+#
+#    data = read.csv("data/TT_csv/TT_occ_q.csv")
+#
+#    res.ca = CA(data,  ncp = 5)
+    
+    ###################################################☺
+    
+    
+    
+    
     # -------------------------
     # AFC
     # -------------------------
