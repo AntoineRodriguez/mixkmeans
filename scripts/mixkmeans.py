@@ -15,6 +15,10 @@ def dist(a, b):
         raise ValueError('a and b must have the same shape')
 
 
+def dist_cosinus():
+    pass
+
+
 # POINT = (question vectorisée, reponse vectorisée)
 def composite_distance(point, prototype, x, weights):
     """
@@ -122,13 +126,9 @@ class MixKMeans:
             Q = dataset[indexes, 0:int(dataset.shape[1] / 2)]
             A = dataset[indexes, int(dataset.shape[1] / 2):]
 
-            sum_dist_q = 0
-            sum_dist_a = 0
+            sum_dist_q = 0.00001
+            sum_dist_a = 0.00001
             print(dataset[indexes].shape)
-
-            if dataset[indexes].shape[0] == 1:
-                prototypes.append(dataset[indexes])
-                continue
 
             if dataset[indexes].shape[0] == 0:
                 prototypes.append(None)
@@ -186,9 +186,10 @@ class MixKMeans:
 
             cost = 0
             for ind, prototype in enumerate(old_prototypes):
+                '''
                 print(10*'---')
                 print(self.prototypes[ind].shape)
-                print(prototype.shape)
+                print(prototype.shape)'''
                 c_d = composite_distance(self.prototypes[ind], prototype, self.x, self.weights)
                 if c_d != 0:
                     cost += math.pow(c_d, 1 / self.x)
