@@ -2,13 +2,10 @@
     Create Document-Thematics matrix and proceed AFC on it
 """
 import pickle
-
 import numpy as np
 from scipy import sparse
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.decomposition import FactorAnalysis
-import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
 
@@ -64,26 +61,18 @@ if __name__ == '__main__':
         pickle.dump(TT_a_tfidf, file)
     
     
-    #matrix TT to df to csv, then use csv file in R code below
-    TT_occ_q = pd.DataFrame(TT_q_occ)  #shape = 4*1 why?
+    #read vocabulary file
+    with open('./data/data_preprocess/vocab.pkl', 'rb') as f:
+        vocab = pickle.load(f)
+    #read TT matrix
+    ##
+    with open('./data/thematics_terms/TTM_questions_occ.pkl', 'rb') as f:
+        TT_q_occ = pickle.load(f)
+    
+    #matrix TT to df to csv, then use csv file in R code (afc.R)
+    TT_occ_q = pd.DataFrame.sparse.from_spmatrix(TT_q_occ, columns = vocab)  #shape = 4*m
     TT_occ_q.to_csv('./data/TT_csv/TT_occ_q.csv')
-
-
-    #################
-    # LE CODE R
-    #################
-#    data = read.csv("data/TT_csv/TT_occ_q.csv")
-#
-#    library(FactoMineR)
-#    library(ggplot2)
-#    library(ggrepel)
-#
-#    data = read.csv("data/TT_csv/TT_occ_q.csv")
-#
-#    res.ca = CA(data,  ncp = 5)
-    
-    ###################################################☺
-    
+       
     
     
     
