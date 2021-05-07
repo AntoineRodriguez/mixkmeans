@@ -11,6 +11,7 @@ from scripts.utils import STOPWORDS, CONTRACTED_FORMS, OTHER_STOPWORDS
 from nltk.stem.snowball import SnowballStemmer
 from nltk.stem.wordnet import WordNetLemmatizer
 
+
 def json_to_pandas(path_json):
     with open(path_json, 'r') as file:
         temp = json.load(file)

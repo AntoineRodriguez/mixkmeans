@@ -2,9 +2,11 @@ import os
 import unittest
 
 from scipy import sparse
+import matplotlib.pyplot as plt
 
 from scripts.mixkmeans import (
-    dist,
+    dist_eucl,
+    dist_cosin,
     composite_distance,
 )
 
@@ -17,7 +19,11 @@ class FunctionsTest(unittest.TestCase):
 
     @unittest.skip
     def test_dist(self):
-        print(dist(self.dtm[0], self.dtm[42]))
+        print(dist_eucl(self.dtm[0], self.dtm[42]))
+
+    @unittest.skip
+    def test_dist_cosin(self):
+        print(dist_cosin(self.dtm[0], self.dtm[42]))
 
     def test_composite_distance(self):
         print(composite_distance(self.dtm[0], self.dtm[86], -3, (0.2, 0.8)))
@@ -45,9 +51,16 @@ class MixKMeansTest(unittest.TestCase):
         self.model.compute_prototypes(self.dtm, assignation)
         #print(self.model.prototypes)
 
+    @unittest.skip
     def test_fit(self):
-        _, __, cost = self.model.fit(self.dtm, 4, 100)
+        _, __, cost = self.model.fit(self.dtm, 4, 30)
         print(cost)
+
+    def test_fit_watch(self):
+        _, __, cost = self.model.fit(self.dtm, 4, 30)
+        print(cost)
+        plt.plot(self.model.cost_historic)
+        plt.savefig('cost_historic_test.png')
 
 
 if __name__ == '__main__':

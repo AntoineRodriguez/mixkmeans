@@ -7,20 +7,26 @@ from random import randint
 from scipy import sparse
 import numpy as np
 
-def dist(a, b):
-    """Element-wise distance between to sparce matrix 1xM"""
+
+def dist_eucl(a, b):
+    """Element-wise distance between two sparce vector 1xM"""
     if a.shape == b.shape:
         return (a - b).power(2).sum(axis=1)[0, 0]
     else:
         raise ValueError('a and b must have the same shape')
 
 
-def dist_cosinus():
-    pass
+# SIMILARITEE COSINUS POUR LE MOMENT !
+def dist_cosin(a, b):
+    """cosinus similarity between two sparce vector 1xM"""
+    if a.shape == b.shape:
+        return (a * b.transpose())[0, 0] / ((a * a.transpose())[0, 0] * (b * b.transpose())[0, 0])
+    else:
+        raise ValueError('a and b must have the same shape')
 
 
 # POINT = (question vectorisée, reponse vectorisée)
-def composite_distance(point, prototype, x, weights):
+def composite_distance(point, prototype, x, weights, distance):
     """
     Compute  point-to-prototype (or point-to-point) distance
 
@@ -31,8 +37,8 @@ def composite_distance(point, prototype, x, weights):
     """
     if point.shape == prototype.shape:
         if point.shape[1] % 2 == 0:
-            d1 = dist(point[:, 0:int(point.shape[1] / 2)], prototype[:, 0:int(prototype.shape[1] / 2)])
-            d2 = dist(point[:, int(point.shape[1] / 2):], prototype[:, int(prototype.shape[1] / 2):])
+            d1 = distance(point[:, 0:int(point.shape[1] / 2)], prototype[:, 0:int(prototype.shape[1] / 2)])
+            d2 = distance(point[:, int(point.shape[1] / 2):], prototype[:, int(prototype.shape[1] / 2):])
 
             temp = 0
             if weights[0] * d1 != 0:
@@ -69,6 +75,7 @@ class MixKMeans:
         self.K = None
         self.itermax = None
 
+        self.cost_historic = None
         self.prototypes = None  # best prototypes
 
     # --------------
@@ -126,12 +133,13 @@ class MixKMeans:
             Q = dataset[indexes, 0:int(dataset.shape[1] / 2)]
             A = dataset[indexes, int(dataset.shape[1] / 2):]
 
-            sum_dist_q = 0.00001
-            sum_dist_a = 0.00001
+            sum_dist_q = 0.000001
+            sum_dist_a = 0.000001
             print(dataset[indexes].shape)
 
             if dataset[indexes].shape[0] == 0:
-                prototypes.append(None)
+                prototypes.append(sparse.csr_matrix(np.zeros((1, dataset.shape[1]))))
+                print('cluster vide')
                 continue
 
             for index, row in enumerate(dataset[indexes]):
@@ -172,6 +180,9 @@ class MixKMeans:
         # print('Begin fitting')
         self.K = K
         self.itermax = itermax
+        self.cost_historic = []
+
+
         self.initialize_prototypes(dataset, self.K)
 
         iteration = 0
@@ -193,8 +204,10 @@ class MixKMeans:
                 c_d = composite_distance(self.prototypes[ind], prototype, self.x, self.weights)
                 if c_d != 0:
                     cost += math.pow(c_d, 1 / self.x)
-            condition = (cost >= 0.0001)
+
+            condition = (cost >= 0.001)
             iteration += 1
+            self.cost_historic.append(cost)
 
         # message pour dire qu'il n'y a pas eu convergence
         if iteration >= self.itermax:
