@@ -5,9 +5,8 @@ from collections import Counter
 from statistics import quantiles
 
 import pandas as pd
-import nltk
 
-from scripts.utils import STOPWORDS, CONTRACTED_FORMS, OTHER_STOPWORDS
+from data_processing.stopwords import STOPWORDS, CONTRACTED_FORMS
 from nltk.stem.snowball import SnowballStemmer
 from nltk.stem.wordnet import WordNetLemmatizer
 

@@ -17,7 +17,7 @@ class SubForumTest(unittest.TestCase):
     def setUp(self):
         self.object = None
 
-    @tests.skip
+    @unittest.skip
     def test_init(self):
         self.object = SubForum('./questions.json',
                                './answers.json')
@@ -81,7 +81,7 @@ class SubForumTest(unittest.TestCase):
         print(self.object.answers['parentid'])
 
 
-class SubForumStatsTest(tests.TestCase):
+class SubForumStatsTest(unittest.TestCase):
     def setUp(self):
         self.object = None
 
@@ -114,7 +114,7 @@ class SubForumStatsTest(tests.TestCase):
         # print(self.object.questions['nb_dups'])
 
 
-class ModuleFunctionTest(tests.TestCase):
+class ModuleFunctionTest(unittest.TestCase):
     def test_get_all_words(self):
         self.object = SubForum('./questions.json',
                                './answers.json')
@@ -125,4 +125,4 @@ class ModuleFunctionTest(tests.TestCase):
 
 
 if __name__ == '__main__':
-    tests.main()
+    unittest.main()

@@ -2,7 +2,7 @@ import pickle
 
 from scipy import sparse
 
-from scripts import MixKMeans
+from mixkmeans import MixKMeans
 
 if __name__ == '__main__':
     dtm = sparse.load_npz('data/data_preprocess/dtm_occ.npz')

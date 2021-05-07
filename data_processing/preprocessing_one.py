@@ -8,7 +8,7 @@ import os
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from scipy import sparse
 
-from scripts.preprocessing.utils import SubForum, get_all_words, reduce_words
+from data_processing.utils import SubForum, get_all_words, reduce_words
 
 if __name__ == '__main__':
     os.chdir('../../')
