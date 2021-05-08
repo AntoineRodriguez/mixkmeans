@@ -47,7 +47,6 @@ if __name__ == '__main__':
     TT_q_tfidf = P_q.transpose().dot(Q_tfidf)
     TT_a_tfidf = P_a.transpose().dot(A_tfidf)
 
-
     #####
     #save TT Matrix
     ####
@@ -59,67 +58,44 @@ if __name__ == '__main__':
         pickle.dump(TT_q_tfidf, file)
     with open('./data/thematics_terms/TTM_answers_tfidf.pkl', 'wb') as file:
         pickle.dump(TT_a_tfidf, file)
+ 
     
+    #-------------------------
+    #apply AFC to any thematic_term_matrix obtained before, matrix TT are converted to df to csv, 
+       #then use csv file in R code (afc.R)
+    #--------------------
     
     #read vocabulary file
     with open('./data/data_preprocess/vocab.pkl', 'rb') as f:
         vocab = pickle.load(f)
-    #read TT matrix
-    ##
+    
+    
+    #TTM_questions_occ
     with open('./data/thematics_terms/TTM_questions_occ.pkl', 'rb') as f:
         TT_q_occ = pickle.load(f)
     
-    #matrix TT to df to csv, then use csv file in R code (afc.R)
     TT_occ_q = pd.DataFrame.sparse.from_spmatrix(TT_q_occ, columns = vocab)  #shape = 4*m
-    TT_occ_q.to_csv('./data/TT_csv/TT_occ_q.csv')
+    TT_occ_q.to_csv('./AFC/TT_occ_q.csv')
        
+    #TTM_answers_occ
+    with open('./data/thematics_terms/TTM_answers_occ.pkl', 'rb') as f:
+        TT_a_occ = pickle.load(f)
+    
+    TT_occ_a = pd.DataFrame.sparse.from_spmatrix(TT_a_occ, columns = vocab)  #shape = 4*m
+    TT_occ_a.to_csv('./AFC/TT_occ_a.csv')
+    
+    #TTM_questions_tfidf
+    with open('./data/thematics_terms/TTM_questions_tfidf.pkl', 'rb') as f:
+        TT_q_tfidf = pickle.load(f)
+    
+    TT_tfidf_q = pd.DataFrame.sparse.from_spmatrix(TT_q_tfidf, columns = vocab)  #shape = 4*m
+    TT_tfidf_q.to_csv('./AFC/TT_tfidf_q.csv')
+    
+    #TTM_answers_tfidf
+    with open('./data/thematics_terms/TTM_answers_tfidf.pkl', 'rb') as f:
+        TT_a_tfidf = pickle.load(f)
+    
+    TT_tfidf_a = pd.DataFrame.sparse.from_spmatrix(TT_a_tfidf, columns = vocab)  #shape = 4*m
+    TT_tfidf_a.to_csv('./AFC/TT_tfidf_a.csv')
     
     
-    
-    # -------------------------
-    # AFC
-    # -------------------------
-
-    #apply AFC to any thematic_term_matrix obtained before
-        
-    # apply AFC to TT_q_occ matrix
-    transformer = FactorAnalysis()  
-    TT_q_occ_transformed = transformer.fit_transform(TT_q_occ.transpose().toarray())
-    TT_q_occ_transformed.transpose().shape  #matrix 4*m
-    
-    # apply AFC to TT_a_occ matrix
-    transformer = FactorAnalysis()  
-    TT_a_occ_transformed = transformer.fit_transform(TT_a_occ.transpose().toarray())
-    TT_a_occ_transformed.transpose().shape
-   
-    # apply AFC to TT_q_tfidf matrix
-    transformer = FactorAnalysis()  
-    TT_q_tfidf_transformed = transformer.fit_transform(TT_q_tfidf.transpose().toarray())
-    TT_q_tfidf_transformed.transpose().shape
-    
-    # apply AFC to TT_a_tfidf matrix
-    transformer = FactorAnalysis()  
-    TT_a_tfidf_transformed = transformer.fit_transform(TT_a_tfidf.transpose().toarray())
-    TT_a_tfidf_transformed.transpose().shape
-
-# TODO: plot sur le 1er plan factoriel
-    
-    
-######################################## method test    
-  
-from factor_analyzer import FactorAnalyzer
-
-fa = FactorAnalyzer()
-f = fa.fit_transform(TT_q_occ.transpose().toarray())
-f.transpose().shape  #------ #3*m
-    
-# Create scree plot using matplotlib
-plt.scatter(range(1,TT_q_occ.transpose().shape[1]+1),ev)
-plt.plot(range(1,TT_q_occ.transpose().shape[1]+1),ev)
-plt.title('Scree Plot')
-plt.xlabel('Factors')
-plt.ylabel('Eigenvalue')
-plt.grid()
-plt.show()
-
-#from fanalysis.ca import CA
