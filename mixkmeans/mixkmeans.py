@@ -4,6 +4,8 @@
 import math
 from random import randint
 
+import pickle
+
 from scipy import sparse
 import numpy as np
 
@@ -11,13 +13,14 @@ from mixkmeans.distances import composite_distance
 
 
 class MixKMeans:
-    def __init__(self, x, weights):
+    def __init__(self, x, weights, distance='eucl', save_file='test.pkl'):
         """
         Initialize the MixKMeans model with hyper-parameters used in distance
         computations
 
         :param x: negative float
         :param weights: tuple or list of the two weights given to each part
+        :param save_file:
         """
         if x != 1 and x > 0:
             raise ValueError('x must be negative or zero')
@@ -31,10 +34,13 @@ class MixKMeans:
 
         # others objects ?
         self.K = None
-        self.itermax = None
+        self.distance = distance
 
         self.cost_historic = None
         self.prototypes = None  # best prototypes
+        self.iteration = 0
+
+        self.SAVE_FILE = save_file
 
     # --------------
     # - Methods needed to fit the model to the data
@@ -52,7 +58,7 @@ class MixKMeans:
             for row in dataset:
                 sum_dist = 0
                 for ind in indexes:
-                    sum_dist += composite_distance(row, dataset[ind], self.x, self.weights)
+                    sum_dist += composite_distance(row, dataset[ind], self.x, self.weights, self.distance)
                 vec_dist.append(sum_dist)
 
             indexes.append(np.argmax(vec_dist))
@@ -74,7 +80,7 @@ class MixKMeans:
         for row in dataset:
             distances = []
             for index, prototype in enumerate(self.prototypes):
-                distances.append(composite_distance(row, prototype, self.x, self.weights))
+                distances.append(composite_distance(row, prototype, self.x, self.weights, self.distance))
             assignation.append(np.argmin(distances))
 
         return assignation
@@ -93,21 +99,21 @@ class MixKMeans:
 
             sum_dist_q = 0.000001
             sum_dist_a = 0.000001
-            print(dataset[indexes].shape)
+            # print(dataset[indexes].shape)
 
             if dataset[indexes].shape[0] == 0:
                 prototypes.append(sparse.csr_matrix(np.zeros((1, dataset.shape[1]))))
-                print('cluster vide')
+                # print('cluster vide')
                 continue
 
             for index, row in enumerate(dataset[indexes]):
-                c_d = composite_distance(row, self.prototypes[cluster_ind], self.x, self.weights)
+                c_d = composite_distance(row, self.prototypes[cluster_ind], self.x, self.weights, self.distance)
                 if c_d != 0:
                     distance_qa = math.pow(c_d, (1 - self.x)/self.x) # noqa
                 else:
                     distance_qa = 0
-                dist_q = distance_qa * composite_distance(row, self.prototypes[cluster_ind], self.x - 1, (1, 0))
-                dist_a = distance_qa * composite_distance(row, self.prototypes[cluster_ind], self.x - 1, (0, 1))
+                dist_q = distance_qa * composite_distance(row, self.prototypes[cluster_ind], self.x - 1, (1, 0), self.distance)
+                dist_a = distance_qa * composite_distance(row, self.prototypes[cluster_ind], self.x - 1, (0, 1), self.distance)
 
                 Q[index] = Q[index].multiply(dist_q)
                 A[index] = A[index].multiply(dist_a)
@@ -126,7 +132,6 @@ class MixKMeans:
     # --------------
     # - fit and predict
     # --------------
-
     def fit(self, dataset, K, itermax):
         """
         Process training of MixKmeans model on our dataset
@@ -135,45 +140,45 @@ class MixKMeans:
         :param K: number of clusters
         :return:
         """
-        # print('Begin fitting')
+        print('Begin fitting')
         self.K = K
-        self.itermax = itermax
-        self.cost_historic = []
 
+        # si jamais il y a besoin de relancer le fit
+        if not self.cost_historic:
+            self.cost_historic = []
+        if not self.prototypes:
+            self.initialize_prototypes(dataset, self.K)
 
-        self.initialize_prototypes(dataset, self.K)
+        assignation = self.assign_clusters(dataset)
 
-        iteration = 0
-        cost = 0
+        old_cost = 0
         condition = True
-        while (iteration < self.itermax) & condition:
-            print(iteration)
-            # assigner à chq point un cluster
-            assignation = self.assign_clusters(dataset)
-            old_prototypes = self.prototypes
-            self.compute_prototypes(dataset, assignation)
-
+        while (self.iteration < itermax) & condition:
+            # calcul de la fonction coût equivalent à l'inertie intraclasse
             cost = 0
-            for ind, prototype in enumerate(old_prototypes):
-                '''
-                print(10*'---')
-                print(self.prototypes[ind].shape)
-                print(prototype.shape)'''
-                c_d = composite_distance(self.prototypes[ind], prototype, self.x, self.weights)
-                if c_d != 0:
-                    cost += math.pow(c_d, 1 / self.x)
+            for ind in range(self.K):
+                mat = dataset[np.array(assignation) == ind]
+                for row in mat:
+                    c_d = composite_distance(row, self.prototypes[ind], self.x, self.weights, self.distance)
+                    if c_d != 0:
+                        cost += math.pow(c_d, 1 / self.x)
 
-            condition = (cost >= 0.001)
-            iteration += 1
+            condition = (abs(cost-old_cost) >= 0.001)  # boolean
+
+            self.compute_prototypes(dataset, assignation)
+            assignation = self.assign_clusters(dataset)
+
+            self.iteration += 1
+
             self.cost_historic.append(cost)
+            old_cost = cost
+            self.save_state()
 
         # message pour dire qu'il n'y a pas eu convergence
-        if iteration >= self.itermax:
-            print('Pas de convergence ! Processus arrêté au bout de {} iterations)'.format(iteration))  # english
+        if self.iteration >= itermax:
+            print('Pas de convergence ! Processus arrêté au bout de {} iterations)'.format(self.iteration))  # english
 
-        last_assignation = self.assign_clusters(dataset)
-
-        return self.prototypes, last_assignation, cost
+        return cost
 
     # Dataset ou moins # TODO
     def predict(self, dataset):
@@ -182,6 +187,13 @@ class MixKMeans:
             return assignation
         else:
             raise TypeError('Need to fit the model before')
+
+    # --------------
+    # - save
+    # --------------
+    def save_state(self):
+        with open(self.SAVE_FILE, 'wb') as file:
+            pickle.dump(self, file)
 
 
 if __name__ == '__main__':
