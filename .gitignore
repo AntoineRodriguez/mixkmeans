@@ -1,6 +1,7 @@
 # data
 /data/
 /old/
+/notebooks/.ipynb_checkpoints/
 
 # Antoine
 /old/

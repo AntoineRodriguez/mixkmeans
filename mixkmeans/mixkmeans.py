@@ -169,6 +169,7 @@ class MixKMeans:
             assignation = self.assign_clusters(dataset)
 
             self.iteration += 1
+            print(self.iteration)
 
             self.cost_historic.append(cost)
             old_cost = cost
