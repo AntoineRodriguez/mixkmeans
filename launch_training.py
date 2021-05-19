@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("data", help="path to data file (.npz)")
 parser.add_argument("-d", "--distance", help="used distance (euclidean or cosinus)")
 parser.add_argument("-s", "--save", help="path to save the MixKmeans object if an error happen")
+parser.add_argument("-k", "--numberK", help="nombre cluster auquel demarré le code")  # TODO: effacer
 
 args = parser.parse_args()
 
@@ -22,7 +23,7 @@ if __name__ == '__main__':
     dtm = sparse.load_npz(args.data)
 
     COST_HISTORIC = []
-    for K in np.arange(50, 550, 50):
+    for K in np.arange(args.numberK, 550, 50):  #modified for launch everywhere
         print('begin fitting with {} clusters'.format(K))
         model = MixKMeans(x=-3, weights=(0.2, 0.8), distance=args.distance, save_file=args.save)
         cost = model.fit(dtm, K, 50)

@@ -3,6 +3,7 @@
 """
 import math
 from random import randint
+from time import time
 
 import pickle
 
@@ -147,7 +148,9 @@ class MixKMeans:
         if not self.cost_historic:
             self.cost_historic = []
         if not self.prototypes:
+            t = time()
             self.initialize_prototypes(dataset, self.K)
+            print('initalisation :  {} s'.format(time() - t))
 
         assignation = self.assign_clusters(dataset)
 
@@ -155,6 +158,7 @@ class MixKMeans:
         condition = True
         while (self.iteration < itermax) & condition:
             # calcul de la fonction coût equivalent à l'inertie intraclasse
+            t = time()
             cost = 0
             for ind in range(self.K):
                 mat = dataset[np.array(assignation) == ind]
@@ -170,7 +174,7 @@ class MixKMeans:
 
             self.iteration += 1
             print(self.iteration)
-
+            print('ITERATION :  {} s'.format(time() - t))
             self.cost_historic.append(cost)
             old_cost = cost
             self.save_state()
