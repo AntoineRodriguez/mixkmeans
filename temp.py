@@ -8,8 +8,6 @@ liste = random.sample(range(21939), 200)
 
 sparse.save_npz('./data/data_preprocess/dtm_test.npz', mat[liste])
 
-mat
-df[assignation==0]
 
 mat = sparse.load_npz('tests/dtm_tes')
 
@@ -23,3 +21,10 @@ for item in range(5):
         raise ValueError
     file.write(str(item)+'\n')
 file.close()
+
+
+### OPEN NPZ
+a = np.load('donneesentrainement/occ_eucl_save-50.npz')
+a.files
+a['arr_0']
+a['arr_1']

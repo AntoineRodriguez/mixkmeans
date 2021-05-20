@@ -3,6 +3,7 @@
 """
 import math
 from random import randint
+from random import sample
 from time import time
 
 import pickle
@@ -52,6 +53,7 @@ class MixKMeans:
         :param dataset:
         :param K: number of clusters
         """
+        '''
         indexes = [randint(0, dataset.shape[0] - 1)]
 
         for i in range(K - 1):
@@ -67,7 +69,15 @@ class MixKMeans:
         prototypes = []
         for ind in indexes:
             prototypes.append(dataset[ind])
+        self.prototypes = prototypes'''
+
+        t = time()
+        indexes = sample(range(dataset.shape[0]), K)
+        prototypes = []
+        for ind in indexes:
+            prototypes.append(dataset[ind])
         self.prototypes = prototypes
+        print('initialisation {} s'.format(time() - t))
 
     def assign_clusters(self, dataset):
         """
