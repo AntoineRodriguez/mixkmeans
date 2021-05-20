@@ -24,7 +24,6 @@ file.close()
 
 
 ### OPEN NPZ
-a = np.load('donneesentrainement/occ_eucl_save-50.npz')
-a.files
+a = np.load('notebooks/backup/tfidf_eucl_save-100.npz')
 a['arr_0']
 a['arr_1']

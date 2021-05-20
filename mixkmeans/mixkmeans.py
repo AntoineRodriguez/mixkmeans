@@ -71,13 +71,11 @@ class MixKMeans:
             prototypes.append(dataset[ind])
         self.prototypes = prototypes'''
 
-        t = time()
         indexes = sample(range(dataset.shape[0]), K)
         prototypes = []
         for ind in indexes:
             prototypes.append(dataset[ind])
         self.prototypes = prototypes
-        print('initialisation {} s'.format(time() - t))
 
     def assign_clusters(self, dataset):
         """
@@ -183,11 +181,10 @@ class MixKMeans:
             assignation = self.assign_clusters(dataset)
 
             self.iteration += 1
-            print(self.iteration)
-            print('ITERATION :  {} s'.format(time() - t))
+            print('ITERATION {}  :  {} s'.format(self.iteration, time() - t))
             self.cost_historic.append(cost)
             old_cost = cost
-            self.save_state()
+            # self.save_state()
 
         # message pour dire qu'il n'y a pas eu convergence
         if self.iteration >= itermax:
