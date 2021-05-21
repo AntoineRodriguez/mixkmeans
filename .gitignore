@@ -8,7 +8,7 @@
 /venv/
 /.idea/
 *.pyc
-
+/old_training/
 
 # Lilia
 /.spyproject/

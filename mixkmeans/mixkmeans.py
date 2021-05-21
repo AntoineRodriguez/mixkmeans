@@ -15,7 +15,7 @@ from mixkmeans.distances import composite_distance
 
 
 class MixKMeans:
-    def __init__(self, x, weights, distance='eucl', save_file='test.pkl'):
+    def __init__(self, x, weights, distance='eucl'):
         """
         Initialize the MixKMeans model with hyper-parameters used in distance
         computations
@@ -41,9 +41,6 @@ class MixKMeans:
         self.cost_historic = None
         self.prototypes = None  # best prototypes
         self.iteration = 0
-
-        self.SAVE_FILE = save_file
-
     # --------------
     # - Methods needed to fit the model to the data
     # --------------
@@ -118,7 +115,10 @@ class MixKMeans:
             for index, row in enumerate(dataset[indexes]):
                 c_d = composite_distance(row, self.prototypes[cluster_ind], self.x, self.weights, self.distance)
                 if c_d != 0:
-                    distance_qa = math.pow(c_d, (1 - self.x)/self.x) # noqa
+                    try:
+                        distance_qa = math.pow(c_d, (1 - self.x)/self.x)
+                    except ValueError:
+                        distance_qa = 0
                 else:
                     distance_qa = 0
                 dist_q = distance_qa * composite_distance(row, self.prototypes[cluster_ind], self.x - 1, (1, 0), self.distance)
@@ -173,7 +173,10 @@ class MixKMeans:
                 for row in mat:
                     c_d = composite_distance(row, self.prototypes[ind], self.x, self.weights, self.distance)
                     if c_d != 0:
-                        cost += math.pow(c_d, 1 / self.x)
+                        try:
+                            cost += math.pow(c_d, 1 / self.x)
+                        except ValueError:
+                            cost += 0
 
             condition = (abs(cost-old_cost) >= 0.001)  # boolean
 
@@ -203,8 +206,8 @@ class MixKMeans:
     # --------------
     # - save
     # --------------
-    def save_state(self):
-        with open(self.SAVE_FILE, 'wb') as file:
+    def save_state(self, save_file='test.pkl'):
+        with open(save_file, 'wb') as file:
             pickle.dump(self, file)
 
 

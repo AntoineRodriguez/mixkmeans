@@ -14,7 +14,7 @@ def dist_eucl(a, b):
 def dist_cosin(a, b):
     """cosinus similarity between two sparce vector 1xM"""
     if a.shape == b.shape:
-        return 1 - (a * b.transpose())[0, 0] / ((a * a.transpose())[0, 0] * (b * b.transpose())[0, 0] + 0.0000001)
+        return 1 - (a * b.transpose())[0, 0] / ((a * a.transpose())[0, 0] * (b * b.transpose())[0, 0] + 0.0001)
         #  return 1 - (a.dot(b.transpose()))[0, 0] / (a.dot(a.transpose())[0, 0] * b.dot(b.transpose())[0, 0] + 0.0000001)  # noqa
     else:
         raise ValueError('a and b must have the same shape')
