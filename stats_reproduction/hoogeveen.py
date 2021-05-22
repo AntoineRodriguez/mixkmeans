@@ -9,7 +9,7 @@
 from time import time
 
 import pandas as pd
-from scripts import SubForumStats
+from data_processing.utils import SubForumStats
 
 
 def reproduce_stats(subforum):
@@ -40,10 +40,10 @@ def reproduce_stats(subforum):
 
 if __name__ == '__main__':
     t = time()
-    android = SubForumStats('../data/android/android_questions.json',
-                            '../data/android/android_answers.json')
+    android = SubForumStats('../data/original_data/android_questions.json',
+                            '../data/original_data/android_answers.json')
     android.delete_columns()
-    android._preprocessing()
+    android.pre_processing()
     dic = reproduce_stats(android)
     # init dataframe
     df = pd.DataFrame(dic, index=['android'])
@@ -51,10 +51,10 @@ if __name__ == '__main__':
     del android
 
     t = time()
-    gis = SubForumStats('../data/gis/gis_questions.json',
-                        '../data/gis/gis_answers.json')
+    gis = SubForumStats('../data/original_data/gis_questions.json',
+                        '../data/original_data/gis_answers.json')
     gis.delete_columns()
-    gis._preprocessing()
+    gis.pre_processing()
     dic = reproduce_stats(gis)
     # update df
     temp = pd.Series(dic, name='gis')
@@ -63,11 +63,11 @@ if __name__ == '__main__':
     del gis
 
     t = time()
-    physics = SubForumStats('../data/physics/physics_questions.json',
-                            '../data/physics/physics_answers.json')
+    physics = SubForumStats('../data/original_data/physics_questions.json',
+                            '../data/original_data/physics_answers.json')
     physics.delete_columns()
-    physics._preprocessing()
-    reproduce_stats(physics)
+    physics.pre_processing()
+    dic = reproduce_stats(physics)
     # update df
     temp = pd.Series(dic, name='physics')
     df = df.append(temp)
@@ -75,11 +75,11 @@ if __name__ == '__main__':
     del physics
 
     t = time()
-    stats = SubForumStats('../data/stats/stats_questions.json',
-                          '../data/stats/stats_answers.json')
+    stats = SubForumStats('../data/original_data/stats_questions.json',
+                          '../data/original_data/stats_answers.json')
     stats.delete_columns()
-    stats._preprocessing()
-    reproduce_stats(stats)
+    stats.pre_processing()
+    dic = reproduce_stats(stats)
     # update df
     temp = pd.Series(dic, name='stats')
     df = df.append(temp)

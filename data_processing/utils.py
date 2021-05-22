@@ -228,6 +228,18 @@ class SubForumStats(SubForum):
 
         self.include_title = True
 
+    def _cleaning(self):
+        """ Discard punctuation in the two dataframes and 'lowerize' strings"""
+        self.answers['body'] = self.answers.apply(
+            lambda row: cleaning(row['body']).lower(),
+            axis=1)
+        self.questions['body'] = self.questions.apply(
+            lambda row: cleaning(row['body']).lower(),
+            axis=1)
+        self.questions['title'] = self.questions.apply(
+            lambda row: cleaning(row['title']).lower(),
+            axis=1)
+
     def delete_columns(self):
         """Delete unwanted columns"""  # pour les statistiques
         self.questions = self.questions[['body', 'title', 'score',
@@ -254,6 +266,7 @@ class SubForumStats(SubForum):
         )
         self.questions['nb_words_threads'] = self.questions['nb_words'].copy()
         # add number of words in title
+
         self.questions['nb_words_threads'] += self.questions.apply(
             lambda row: len(row['title']),
             axis=1
