@@ -17,27 +17,27 @@ if __name__ == '__main__':
     # ----------------------
 
     android = SubForum('./data/original_data/android_questions.json',
-                    './data/original_data/android_answers.json')
+                       './data/original_data/android_answers.json')
     # only android for the moment, needs to do that to deal with memory
     android.change_ids('a')
     android.pre_processing()
 
     gis = SubForum('./data/original_data/gis_questions.json',
-               './data/original_data/gis_answers.json')
+                   './data/original_data/gis_answers.json')
     gis.change_ids('g')
     gis.pre_processing()
     android += gis
     del gis
 
     physics = SubForum('./data/original_data/physics_questions.json',
-                   './data/original_data/physics_answers.json')
+                       './data/original_data/physics_answers.json')
     physics.change_ids('p')
     physics.pre_processing()
     android += physics
     del physics
 
     stats = SubForum('./data/original_data/stats_questions.json',
-                 './data/original_data/stats_answers.json')
+                     './data/original_data/stats_answers.json')
     stats.change_ids('s')
     stats.pre_processing()
     android += stats

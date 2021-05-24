@@ -27,7 +27,7 @@ def reduce_words(words):
 
 def get_all_words(subforum):
     """
-    description
+    Get all words used in a subforum object
 
     subforum : SubForum object
     """
@@ -186,21 +186,13 @@ class SubForum:
         self.answers = self.answers[['body', 'parentid', 'score']]
 
     def change_ids(self, letter):
-        # TODO : Petite explication dans le LateX
         new_index = [letter + item for item in list(self.questions.index)]
         self.questions.index = new_index
         new_index = [letter + item for item in list(self.answers.index)]
         self.answers.index = new_index
-        '''
-        self.answers['parentid'] = self.answers.apply(
-            lambda row: [letter + item for item in row['parentid']],  # noqa
-            axis=1)'''
         self.answers['parentid'] = self.answers['parentid'].apply(lambda item: letter + item)  # noqa
 
-    # TODO: fonction retirer les mauvaises lignes
-
     def delete_rows(self):
-        """"""
         # score sup à 6
         self.answers = self.answers[self.answers['score'] >= 6]
         # seulement les qa valides

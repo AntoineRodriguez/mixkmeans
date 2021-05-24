@@ -1,2 +1,0 @@
-effacer temp.py 
-effacer requirements_2.txt

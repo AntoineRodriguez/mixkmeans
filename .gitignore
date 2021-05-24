@@ -8,7 +8,13 @@
 /venv/
 /.idea/
 *.pyc
+
+
 /old_training/
+/study/data_test/useless/
+/results_training/npz/
+/results_training/pkl/
 
 # Lilia
 /.spyproject/
+

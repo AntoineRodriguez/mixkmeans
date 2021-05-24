@@ -10,26 +10,17 @@ def dist_eucl(a, b):
         raise ValueError('a and b must have the same shape')
 
 
-# SIMILARITEE COSINUS POUR LE MOMENT !
 def dist_cosin(a, b):
     """cosinus similarity between two sparce vector 1xM"""
     if a.shape == b.shape:
         return 1 - (a * b.transpose())[0, 0] / ((a * a.transpose())[0, 0] * (b * b.transpose())[0, 0] + 0.0001)
-        #  return 1 - (a.dot(b.transpose()))[0, 0] / (a.dot(a.transpose())[0, 0] * b.dot(b.transpose())[0, 0] + 0.0000001)  # noqa
     else:
         raise ValueError('a and b must have the same shape')
 
 
 # POINT = (question vectorisée, reponse vectorisée)
 def composite_distance(point, prototype, x, weights, distance='eucl'):
-    """
-    Compute  point-to-prototype (or point-to-point) distance
-
-    :param point, prototype:
-    :param x:
-    :param weights:
-    :return:
-    """
+    """Compute  point-to-prototype (or point-to-point) distance"""
     if distance == 'eucl':
         distance_func = dist_eucl
     elif distance == 'cosin':

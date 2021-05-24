@@ -22,7 +22,6 @@ class MixKMeans:
 
         :param x: negative float
         :param weights: tuple or list of the two weights given to each part
-        :param save_file:
         """
         if x != 1 and x > 0:
             raise ValueError('x must be negative or zero')
@@ -34,23 +33,22 @@ class MixKMeans:
         else:
             self.weights = weights
 
-        # others objects ?
         self.K = None
         self.distance = distance
 
         self.cost_historic = None
         self.prototypes = None  # best prototypes
         self.iteration = 0
+
     # --------------
     # - Methods needed to fit the model to the data
     # --------------
-    def initialize_prototypes(self, dataset, K):
+    def alternative_init(self, dataset, K):
         """
         Initialize prototypes (i.e. centroid in this mixkmeans) inspired to 'spreading out the cluster centroids'
         :param dataset:
         :param K: number of clusters
         """
-        '''
         indexes = [randint(0, dataset.shape[0] - 1)]
 
         for i in range(K - 1):
@@ -66,8 +64,10 @@ class MixKMeans:
         prototypes = []
         for ind in indexes:
             prototypes.append(dataset[ind])
-        self.prototypes = prototypes'''
+        self.prototypes = prototypes
 
+    def initialize_prototypes(self, dataset, K):
+        """Random initialization of prototypes"""
         indexes = sample(range(dataset.shape[0]), K)
         prototypes = []
         for ind in indexes:
@@ -105,11 +105,9 @@ class MixKMeans:
 
             sum_dist_q = 0.000001
             sum_dist_a = 0.000001
-            # print(dataset[indexes].shape)
 
             if dataset[indexes].shape[0] == 0:
                 prototypes.append(sparse.csr_matrix(np.zeros((1, dataset.shape[1]))))
-                # print('cluster vide')
                 continue
 
             for index, row in enumerate(dataset[indexes]):
@@ -152,7 +150,7 @@ class MixKMeans:
         print('Begin fitting')
         self.K = K
 
-        # si jamais il y a besoin de relancer le fit
+        # if needed
         if not self.cost_historic:
             self.cost_historic = []
         if not self.prototypes:
@@ -187,16 +185,14 @@ class MixKMeans:
             print('ITERATION {}  :  {} s'.format(self.iteration, time() - t))
             self.cost_historic.append(cost)
             old_cost = cost
-            # self.save_state()
 
-        # message pour dire qu'il n'y a pas eu convergence
         if self.iteration >= itermax:
             print('Pas de convergence ! Processus arrêté au bout de {} iterations)'.format(self.iteration))  # english
 
         return cost
 
-    # Dataset ou moins # TODO
     def predict(self, dataset):
+        """can predict on qa in csr_matrix form"""
         if self.prototypes:
             assignation = self.assign_clusters(dataset)
             return assignation
@@ -206,10 +202,10 @@ class MixKMeans:
     # --------------
     # - save
     # --------------
-    def save_state(self, save_file='test.pkl'):
+    def save_state(self, save_file='test.pkl'):  # test.pkl for unitary test
         with open(save_file, 'wb') as file:
             pickle.dump(self, file)
 
 
 if __name__ == '__main__':
-    pass
+    print('coucou')
