@@ -1,5 +1,5 @@
-https://img.shields.io/github/followers/LiliaHarireche?label=LiliaHarireche&style=social
-https://img.shields.io/github/followers/pythauresk?label=AntoineRodriguez&style=social
+[![Github URL](https://img.shields.io/github/followers/LiliaHarireche?label=LiliaHarireche&style=social)](https://github.com/LiliaHarireche)
+[![Github URL](https://img.shields.io/github/followers/pythauresk?label=AntoineRodriguez&style=social)](https://github.com/pythauresk)
 
 # mixkmeans
 
